@@ -6,30 +6,97 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      background-color: #f1f5f9;
+      background: linear-gradient(135deg, #735DA5, #D3C5E5);
+      background-size: 200% 200%;
+      animation: bg-animate 8s ease infinite;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      font-family: 'Segoe UI', sans-serif;
     }
+
+
+    @keyframes bg-animate {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
     .search-box {
-      background: #ffffff;
-      padding: 30px;
-      margin-top: 50px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      animation: fade-in-up 0.6s ease-out both;
     }
+
+
     h2 {
-      color: #1e3a8a;
+      color: #735DA5;
+      font-weight: bold;
+      margin-bottom: 25px;
+      text-align: center;
     }
+
+
+    .form-control:focus {
+      border-color: #735DA5;
+      box-shadow: 0 0 0 2px rgba(115, 93, 165, 0.2);
+      outline: none;
+    }
+
+
     .result-item {
-      background: #e0f2fe;
-      border: 1px solid #bae6fd;
-      padding: 10px 15px;
-      margin-bottom: 10px;
-      border-radius: 6px;
+      background: #f5f0fa;
+      border: 1px solid #d8cde9;
+      padding: 12px 18px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      animation: fade-in-up 0.3s ease both;
+    }
+
+
+    .btn-outline-primary {
+      color: #735DA5;
+      border-color: #735DA5;
+    }
+
+
+    .btn-outline-primary:hover {
+      background-color: #735DA5;
+      color: white;
+    }
+
+
+    @media (max-width: 768px) {
+      .search-box {
+        padding: 30px 20px;
+      }
     }
   </style>
+
+
   <script>
     async function searchFile() {
-      const query = document.getElementById('searchInput').value;
-      const res = await fetch(`/api/search?q=${query}`);
+      const query = document.getElementById('searchInput').value.trim();
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       const files = await res.json();
       const resultList = document.getElementById('results');
       resultList.innerHTML = '';
@@ -39,7 +106,9 @@
         files.forEach(file => {
           const item = document.createElement('div');
           item.className = 'result-item';
-          item.innerHTML = `<strong>${file.file_name}</strong> (${file.file_code})<br><small>📦 Location: ${file.location}</small>`;
+          item.innerHTML = `
+            <strong>${file.file_name}</strong> (${file.file_code})<br>
+            <small>📦 Location: ${file.location}</small>`;
           resultList.appendChild(item);
         });
       }
@@ -47,13 +116,24 @@
   </script>
 </head>
 <body>
-  <div class="container">
-    <div class="search-box">
-      <h2>🔍 Search File</h2>
-      <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by name or code..." onkeyup="searchFile()" />
-      <div id="results"></div>
-      <a href="/" class="btn btn-outline-primary mt-4">⬅️ Back to Add File</a>
-    </div>
+  <div class="search-box">
+    <h2>🔍 Search File</h2>
+    <input
+      type="text"
+      id="searchInput"
+      class="form-control mb-4"
+      placeholder="Search by name or code..."
+      onkeyup="searchFile()"
+    />
+    <div id="results"></div>
+    <a href="/" class="btn btn-outline-primary mt-4 w-100">⬅️ Back to Add File</a>
   </div>
 </body>
 </html>
+
+
+
+
+
+
+
