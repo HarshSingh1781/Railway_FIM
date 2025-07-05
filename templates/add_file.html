@@ -14,17 +14,31 @@
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       margin-top: 50px;
+      position: relative;
     }
     h2 {
       color: #1d3557;
       margin-bottom: 25px;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="form-box">
+      <!-- Logout Button -->
+      <a href="/logout" class="btn btn-outline-danger logout-btn">🚪 Logout</a>
+
+
+      <!-- Header -->
       <h2>➕ Add New File</h2>
+
+
+      <!-- Add File Form -->
       <form method="POST" action="/add">
         <div class="row g-3">
           <div class="col-md-6">
@@ -49,6 +63,8 @@
         <button class="btn btn-primary mt-4">Add File</button>
       </form>
 
+
+      <!-- Excel Import -->
       <hr class="my-4" />
       <form method="POST" action="/import" enctype="multipart/form-data">
         <label class="form-label">📥 Import from Excel:</label>
@@ -56,6 +72,8 @@
         <button class="btn btn-secondary">Upload Excel</button>
       </form>
 
+
+      <!-- Export and Search -->
       <hr class="my-4" />
       <a href="/export" class="btn btn-success">📤 Export All Files (Excel)</a>
       <a href="/search" class="btn btn-outline-primary ms-2">🔍 Go to Search</a>
@@ -63,3 +81,8 @@
   </div>
 </body>
 </html>
+
+
+
+
+
