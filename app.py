@@ -4,16 +4,15 @@ import pandas as pd
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
-
+from itsdangerous import URLSafeTimedSerializer, BadSignature
 
 app = Flask(__name__)
 app.secret_key = 'yK@p1A$9vTz3!mB2#qW8^LrXeCfHsJ0u'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 DB = 'database.db'
-
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
 
 # ------------------- DB Setup -------------------
 def init_db():
@@ -35,7 +34,6 @@ def init_db():
         )''')
         conn.commit()
 
-
 # ------------------- Auth Middleware -------------------
 def login_required(f):
     @wraps(f)
@@ -45,7 +43,6 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
-
 
 # ------------------- Auth Routes -------------------
 @app.route('/signup', methods=['GET', 'POST'])
@@ -64,7 +61,6 @@ def signup():
     categories = [cat for cat, msg in get_flashed_messages(with_categories=True)]
     return render_template('login.html', flash_categories=json.dumps(categories))
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -81,13 +77,44 @@ def login():
     categories = [cat for cat, msg in get_flashed_messages(with_categories=True)]
     return render_template('login.html', flash_categories=json.dumps(categories))
 
-
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     flash('Logged out successfully.', 'info')
     return redirect(url_for('login'))
 
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        username = request.form['username']
+        with sqlite3.connect(DB) as conn:
+            user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+        if not user:
+            flash("Username doesn't exist", 'danger')
+            return redirect(url_for('forgot_password'))
+        token = serializer.dumps(username, salt='reset-password')
+        reset_url = url_for('reset_password', token=token, _external=True)
+        print(f"[RESET LINK] {reset_url}")
+        flash("Reset link sent! Check console (dev mode).", 'info')
+        return redirect(url_for('login'))
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        username = serializer.loads(token, salt='reset-password', max_age=3600)
+    except BadSignature:
+        flash("Invalid or expired link", 'danger')
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        new_pass = request.form['password']
+        hashed = generate_password_hash(new_pass)
+        with sqlite3.connect(DB) as conn:
+            conn.execute("UPDATE users SET password = ? WHERE username = ?", (hashed, username))
+            conn.commit()
+        flash("Password updated! Please log in.", 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', username=username)
 
 # ------------------- Core Routes -------------------
 @app.route('/')
@@ -95,12 +122,10 @@ def logout():
 def home():
     return render_template('add_file.html', username=session.get('user'))
 
-
 @app.route('/search')
 @login_required
 def search_page():
     return render_template('search_file.html')
-
 
 @app.route('/add', methods=['POST'])
 @login_required
@@ -117,7 +142,6 @@ def add_file():
         except sqlite3.IntegrityError:
             flash("Duplicate file code.", "danger")
     return redirect(url_for('home'))
-
 
 @app.route('/api/search')
 @login_required
@@ -137,7 +161,6 @@ def search():
             } for r in rows
         ])
 
-
 @app.route('/export')
 @login_required
 def export_excel():
@@ -146,7 +169,6 @@ def export_excel():
         path = os.path.join(app.config['UPLOAD_FOLDER'], 'exported_files.xlsx')
         df.to_excel(path, index=False)
         return send_file(path, as_attachment=True)
-
 
 @app.route('/import', methods=['POST'])
 @login_required
@@ -163,13 +185,8 @@ def import_excel():
         flash("Invalid file type. Please upload .xlsx", "danger")
     return redirect(url_for('home'))
 
-
 # ------------------- Run App -------------------
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
-
-
-
-
 
