@@ -143,14 +143,12 @@
       <button id="btn-signup">Sign Up</button>
     </div>
 
-    <!-- Flash error messages -->
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="w-100">
           {% for category, message in messages %}
-            {% if 'invalid' in message.lower() or 'exists' in message.lower() or 'required' in message.lower() %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endif %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
           {% endfor %}
         </div>
       {% endif %}
@@ -164,7 +162,7 @@
         <form method="POST" action="{{ url_for('login') }}">
           <input type="text" name="username" placeholder="Username" required />
           <input type="password" name="password" placeholder="Password" required />
-          <a href="#" class="forgot-link">Forgot password?</a>
+          <a href="#" class="forgot-link" data-bs-toggle="modal" data-bs-target="#forgotModal">Forgot password?</a>
           <button type="submit">Login</button>
         </form>
       </div>
@@ -181,6 +179,29 @@
     </div>
   </div>
 
+  <!-- Forgot Password Modal -->
+  <div class="modal fade" id="forgotModal" tabindex="-1" aria-labelledby="forgotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 rounded-4">
+        <div class="modal-header" style="background-color:#735DA5; color:white; border-top-left-radius:1rem; border-top-right-radius:1rem;">
+          <h5 class="modal-title" id="forgotModalLabel">Reset Password</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="{{ url_for('forgot_password') }}">
+          <div class="modal-body p-4">
+            <label class="form-label">Enter your username:</label>
+            <input type="text" class="form-control" name="username" required placeholder="Username">
+          </div>
+          <div class="modal-footer px-4 pb-4">
+            <button type="submit" class="btn btn-primary w-100" style="background:#735DA5; border:none;">Send Reset Link</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const btnLogin = document.getElementById('btn-login');
     const btnSignup = document.getElementById('btn-signup');
@@ -200,6 +221,5 @@
   </script>
 </body>
 </html>
-
 
 
