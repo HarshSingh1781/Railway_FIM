@@ -88,13 +88,13 @@
 <body>
   <div class="auth-container">
     <div class="auth-tabs">
-      <div class="auth-tab active">Login</div>
+      <a href="/login" class="auth-tab active" style="text-decoration:none;">Login</a>
       <a href="/signup" class="auth-tab" style="text-decoration:none;">Sign Up</a>
     </div>
     <div class="auth-content">
       <div class="auth-title">Welcome Back <span>👋</span></div>
-      <form method="POST">
-        <input type="text" name="username" class="form-control" placeholder="Username" required>
+      <form method="POST" autocomplete="off">
+        <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
         <input type="password" name="password" class="form-control" placeholder="Password" required>
         <a href="/forgot" class="forgot-link">Forgot password?</a>
         <button class="btn btn-primary w-100">Login</button>
