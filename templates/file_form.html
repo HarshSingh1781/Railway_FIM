@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit File' if mode == 'edit' else 'Add File' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card p-4 shadow-sm mx-auto">
+      <h3 class="text-center mb-4">{{ '✏️ Edit File' if mode == 'edit' else '➕ Add New File' }}</h3>
+      <form method="POST" action="{{ form_action }}" autocomplete="off">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <input name="file_name" class="form-control" placeholder="File Name" value="{{ file.file_name if file else '' }}" required />
+          </div>
+          <div class="col-md-6">
+            <input name="file_code" class="form-control" placeholder="Unique File Code" value="{{ file.file_code if file else '' }}" {% if mode == 'edit' %}readonly{% endif %} required />
+          </div>
+          <div class="col-12">
+            <input name="tags" class="form-control" placeholder="Tags (optional)" value="{{ file.tags if file else '' }}" />
+          </div>
+          <div class="col-md-4">
+            <input name="cabinet" class="form-control" placeholder="Cabinet (e.g., A)" value="{{ file.cabinet if file else '' }}" required />
+          </div>
+          <div class="col-md-4">
+            <input name="shelf" class="form-control" placeholder="Shelf (e.g., 1)" value="{{ file.shelf if file else '' }}" required />
+          </div>
+          <div class="col-md-4">
+            <input name="box" class="form-control" placeholder="Box (e.g., 5)" value="{{ file.box if file else '' }}" required />
+          </div>
+        </div>
+        <button class="btn btn-primary mt-4 w-100">{{ 'Update File' if mode == 'edit' else 'Add File' }}</button>
+      </form>
+      {% if mode == 'add' %}
+      <hr class="my-4" />
+      <form method="POST" action="/import" enctype="multipart/form-data">
+        <label class="form-label">Import from Excel:</label>
+        <input type="file" name="excel_file" accept=".xlsx" class="form-control mb-3" required />
+        <button class="btn btn-secondary" type="submit">Upload Excel</button>
+      </form>
+      <hr class="my-4" />
+      <a href="/export" class="btn btn-success">Export All Files (Excel)</a>
+      {% endif %}
+      <!-- <a href="/search" class="btn btn-outline-primary ms-2 mt-3">🔍 Go to Search</a> -->
+      <a href="/logout" class="btn btn-danger float-end mt-3">🚪 Logout</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
